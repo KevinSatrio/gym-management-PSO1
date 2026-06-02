@@ -4,5 +4,13 @@
     <exclude-pattern>vendor/</exclude-pattern>
     <exclude-pattern>.github/</exclude-pattern>
     <arg name="extensions" value="php"/>
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <exclude name="PSR1.Files.SideEffects"/>
+    </rule>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="250"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
 </ruleset>
