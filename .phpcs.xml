@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="Gym Management">
+    <file>.</file>
+    <exclude-pattern>vendor/</exclude-pattern>
+    <exclude-pattern>.github/</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <rule ref="PSR12"/>
+</ruleset>
