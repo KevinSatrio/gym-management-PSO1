@@ -1,0 +1,52 @@
+name: PHP CI 
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build containers
+        run: docker compose build
+
+      - name: Run containers
+        run: docker compose up -d
+
+      - name: Wait for containers (DB ready)
+        run: sleep 15
+
+      - name: Install Composer dependencies
+        run: docker compose exec -T app composer install --no-interaction --prefer-dist
+
+      - name: Validate composer.json
+        run: docker compose exec -T app composer validate
+
+      - name: Check PHP syntax (lint)
+        run: docker compose exec -T app find . -type f -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+
+      - name: Run PHP_CodeSniffer (PSR-12)
+        run: docker compose exec -T app ./vendor/bin/phpcs
+
+      - name: Test DB Connection
+        run: |
+          docker compose exec -T app php -r "
+          \$con = mysqli_connect(
+            getenv('DB_HOST'),
+            getenv('DB_USER'),
+            getenv('DB_PASS'),
+            getenv('DB_NAME')
+          );
+          if (!\$con) {
+            echo 'DB FAILED';
+            exit(1);
+          }
+          echo 'DB OK';
+          "
