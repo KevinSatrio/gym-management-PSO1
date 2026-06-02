@@ -3,10 +3,10 @@
 
 // php select option value from database
 
-$hostname = "localhost";
-$username = "root";
-$password = "";
-$databaseName = "loginsystem";
+$hostname = getenv('DB_HOST') ?: '127.0.0.1';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$databaseName = getenv('DB_NAME') ?: 'loginsystem';
 
 // connect to mysql database
 

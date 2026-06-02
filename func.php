@@ -1,5 +1,10 @@
 <?php
-$con=mysqli_connect("localhost","root","","loginsystem");
+$con = mysqli_connect(
+    getenv('DB_HOST') ?: '127.0.0.1',
+    getenv('DB_USER') ?: 'root',
+    getenv('DB_PASS') ?: '',
+    getenv('DB_NAME') ?: 'loginsystem'
+);
 if(isset($_POST['login_submit'])){
 	$username=$_POST['username'];
 	$password=$_POST['password'];
