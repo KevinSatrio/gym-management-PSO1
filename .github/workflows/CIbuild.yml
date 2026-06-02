@@ -32,6 +32,10 @@ jobs:
       - name: Check PHP syntax (lint)
         run: docker compose exec -T app find . -type f -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
 
+      - name: Fix coding style with PHPCBF
+        run: docker compose exec -T app ./vendor/bin/phpcbf
+        continue-on-error: true
+
       - name: Run PHP_CodeSniffer (PSR-12)
         run: docker compose exec -T app ./vendor/bin/phpcs
 
