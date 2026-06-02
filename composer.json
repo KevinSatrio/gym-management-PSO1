@@ -1,4 +1,7 @@
 {
+    "name": "kevinsatrio/gym-management-pso1",
+    "description": "Gym Management System",
+    "license": "proprietary",
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.0",
         "phpstan/phpstan": "^1.0"
