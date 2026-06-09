@@ -2,13 +2,11 @@ name: Trigger auto deployment for gym-management-pso
 
 # When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
-  push:
-    branches: 
-      [ master ]
-    paths:
-    - '**'
-    - '.github/workflows/gym-management-pso-AutoDeployTrigger-00290eaf-5132-4114-b734-1a5e2588a2fa.yml'
+  workflow_run:
+    workflows: ["PHP CI"]
+    types:
+      - completed
+    branches: [master]
 
   # Allow manual trigger 
   workflow_dispatch:      
@@ -16,6 +14,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     permissions: 
       id-token: write #This is required for requesting the OIDC JWT Token
       contents: read #Required when GH token is used to authenticate with private repo
@@ -35,15 +34,13 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
+          dockerfilePath: ./Dockerfile
           registryUrl: gymmanagementacr-dhfng6eshecncjeq.azurecr.io
           registryUsername: ${{ secrets.GYMMANAGEMENTPSO_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.GYMMANAGEMENTPSO_REGISTRY_PASSWORD }}
           containerAppName: gym-management-pso
           resourceGroup: gym-management-rg
           imageToBuild: gymmanagementacr-dhfng6eshecncjeq.azurecr.io/gym-management-pso:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+
 
 
