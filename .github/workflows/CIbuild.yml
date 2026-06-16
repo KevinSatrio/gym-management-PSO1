@@ -42,6 +42,8 @@ jobs:
           }
           echo 'DB OK';
           "
+      - name: Create reports directory
+        run: docker compose exec -T app mkdir -p reports/phpunit
       - name: Run PHPUnit tests
         run: docker compose exec -T app ./vendor/bin/phpunit --configuration phpunit.xml
       - name: Upload PHPUnit test results
