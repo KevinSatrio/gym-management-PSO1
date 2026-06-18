@@ -7,33 +7,43 @@ require_once 'db.php';
 $page_title = "Dashboard";
 $current_page = "dashboard";
 
-// Fetch summary counts
-$totalMembers = dbCountRows("SELECT COUNT(*) FROM doctorapp");
-$activeMemberships = dbCountRows("SELECT COUNT(*) FROM MembershipProgram WHERE status = 'ACTIVE' AND deleted_at IS NULL");
-$totalTrainers = dbCountRows("SELECT COUNT(*) FROM Trainer");
-$totalPackages = dbCountRows("SELECT COUNT(*) FROM Package");
-$totalPayments = dbCountRows("SELECT COUNT(*) FROM Payment");
+try {
+    // Fetch summary counts
+    $totalMembers = dbCountRows("SELECT COUNT(*) FROM doctorapp");
+    $activeMemberships = dbCountRows("SELECT COUNT(*) FROM MembershipProgram WHERE status = 'ACTIVE' AND deleted_at IS NULL");
+    $totalTrainers = dbCountRows("SELECT COUNT(*) FROM Trainer");
+    $totalPackages = dbCountRows("SELECT COUNT(*) FROM Package");
+    $totalPayments = dbCountRows("SELECT COUNT(*) FROM Payment");
 
-// Recent memberships (last 5)
-$recentMemberships = dbFetchAll(
-    "SELECT mp.membership_id, mp.start_date, mp.end_date, mp.status,
-            CONCAT(d.fname, ' ', d.lname) AS member_name,
-            p.Package_name
-     FROM MembershipProgram mp
-     LEFT JOIN doctorapp d ON mp.member_id = d.contact
-     LEFT JOIN Package p ON mp.package_id = p.Package_id
-     WHERE mp.deleted_at IS NULL
-     ORDER BY mp.created_at DESC
-     LIMIT 5"
-);
+    // Recent memberships (last 5)
+    $recentMemberships = dbFetchAll(
+        "SELECT mp.membership_id, mp.start_date, mp.end_date, mp.status,
+                CONCAT(d.fname, ' ', d.lname) AS member_name,
+                p.Package_name
+         FROM MembershipProgram mp
+         LEFT JOIN doctorapp d ON mp.member_id = d.contact
+         LEFT JOIN Package p ON mp.package_id = p.Package_id
+         WHERE mp.deleted_at IS NULL
+         ORDER BY mp.created_at DESC
+         LIMIT 5"
+    );
 
-// Expiring soon (within 7 days)
-$expiringSoon = dbCountRows(
-    "SELECT COUNT(*) FROM MembershipProgram
-     WHERE status = 'ACTIVE'
-       AND deleted_at IS NULL
-       AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)"
-);
+    // Expiring soon (within 7 days)
+    $expiringSoon = dbCountRows(
+        "SELECT COUNT(*) FROM MembershipProgram
+         WHERE status = 'ACTIVE'
+           AND deleted_at IS NULL
+           AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)"
+    );
+} catch (mysqli_sql_exception $e) {
+    // If table doesn't exist, automatically redirect to migration
+    if (strpos($e->getMessage(), "doesn't exist") !== false || strpos($e->getMessage(), "Unknown column") !== false) {
+        header("Location: run_migration.php");
+        exit;
+    }
+    // Re-throw if it's another error
+    throw $e;
+}
 
 ob_start();
 ?>

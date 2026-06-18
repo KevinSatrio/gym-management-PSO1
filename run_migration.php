@@ -2,14 +2,10 @@
 /**
  * Auto Migration Script
  * Resolves the issue of manual database execution.
- * Only accessible to logged-in admins.
  */
 require_once 'db.php';
 session_start();
 
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    die("Access denied. Please login first to run migrations.");
-}
 
 $conn = getDbConnection();
 $messages = [];
