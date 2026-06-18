@@ -1,52 +1,82 @@
+<?php
+/**
+ * Login Page — FitManager Gym Management System
+ *
+ * Modern glassmorphic login with session management.
+ * Handles logout via ?logout=1 parameter.
+ */
+session_start();
+
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
+// If already logged in, redirect to dashboard
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: dashboard.php");
+    exit;
+}
+
+// Check for login error from func.php
+$loginError = isset($_SESSION['login_error']) ? $_SESSION['login_error'] : '';
+unset($_SESSION['login_error']);
+?>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FitManager — Gym Management System Login">
+    <title>Sign In — FitManager</title>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-  </head>
-  <style type="text/css">
-    #inputbtn:hover{cursor:pointer;}
-  </style>
-  <body style="background:url('images/4.jpg'); background-size: cover;">
-    <div class="container-fluid" style="margin-top:60px;margin-bottom:60px;color:#34495E;">
-      <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-4">
-          <div class="card">
-            <img src="images/cardback.jpg" class="card-img-top">
-            <div class="card-body">
-              <center>
-              <h5>Admin Login</h5><br>
-              <form class="form-group" method="POST" action="admin-panel.php">
-                <div class="row">
-                  <div class="col-md-4"><label>Username: </label></div>
-                  <div class="col-md-8"><input type="text" name="username" class="form-control" placeholder="enter username" required/></div><br><br>
-                  <div class="col-md-4"><label>Password: </label></div>
-                  <div class="col-md-8"><input type="password" class="form-control" name="password" placeholder="enter password" required/></div><br><br><br>
-                </div>
-                <center><input type="submit" id="inputbtn" name="login_submit" value="Login" class="btn btn-primary"></center>
-              </form>
-            
-              
-            </center>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="style.css" rel="stylesheet">
+</head>
+<body class="login-page">
+
+    <div class="login-card fade-in">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="bi bi-lightning-charge-fill"></i>
             </div>
-          </div>
+            <h2>FitManager</h2>
+            <p>Gym Management System</p>
         </div>
-         <div class="col-md-7"></div>
-      </div>
+
+        <?php if ($loginError): ?>
+            <div class="login-error">
+                <i class="bi bi-exclamation-circle"></i> <?php echo htmlspecialchars($loginError); ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="func.php" method="POST" id="loginForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username"
+                       placeholder="Enter your username" required autocomplete="username">
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password"
+                       placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="login_submit" id="btn-login">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Sign In
+            </button>
+        </form>
     </div>
 
-
-
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-  </body>
+<!-- Bootstrap 5.3 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

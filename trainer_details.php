@@ -1,50 +1,67 @@
-<!DOCTYPE html>
-<?php include("func.php");?>
-<html>
-<head>
-	<title>Members details</title>
-	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-</head>
-<body>
-<div class="jumbotron" style="background: url('images/2.jpg') no-repeat;background-size: cover;height: 300px;"></div>	
+<?php
+/**
+ * Member Directory — View all registered members with search
+ */
+require_once 'func.php';
 
- <div class="container">
-<div class="card">
-     <div class="card-body" style="background-color:#3498DB;color:#ffffff;">
-         <div class="row">
-             <div class="col-md-1">
-    <a href="admin-panel.php" class="btn btn-light ">Go Back</a>
-             </div>
-             <div class="col-md-3"><h3>Members Details</h3></div>
-             <div class="col-md-8">
-         <form class="form-group" action="trainer_search.php" method="post">
-          <div class="row">
-   <div class="col-md-10"><input type="text" name="search" class="form-control" placeholder="enter contact"></div>
-              <div class="col-md-2"><input type="submit" name="patient_search_submit" class="btn btn-light" value="Search"> </div></div>           
-                 </form></div></div></div>
-     <div class="card-body" style="background-color:#3498DB;color:#ffffff;">
-         <div class="card-body">
-    <table class="table table-hover">
-        <thead>
-     <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-         <th>Email id</th>
-         <th>Member ID</th>
-         <th>Trainer ID</th>
-        </tr>   
-        </thead>
-        <tbody>
-          <?php get_patient_details(); ?>
-        </tbody>
-    </table>
-     </div>
+$page_title = "Member Directory";
+$current_page = "members";
+
+ob_start();
+?>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-people-fill" style="margin-right:8px; color:var(--primary-500);"></i>Member Directory</h1>
+        <p>View and search all registered gym members</p>
     </div>
+    <a href="admin-panel.php" class="btn btn-primary" id="btn-add-new-member">
+        <i class="bi bi-person-plus-fill"></i> Add New Member
+    </a>
+</div>
+
+<!-- Search Toolbar -->
+<div class="toolbar">
+    <form action="trainer_search.php" method="post" id="form-member-search" class="d-flex align-items-center gap-2" style="flex:1; max-width:500px;">
+        <div class="search-box" style="flex:1;">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" id="input-member-search" class="form-control" placeholder="Search by name or member ID...">
+        </div>
+        <button type="submit" name="patient_search_submit" class="btn btn-primary" id="btn-search-member">
+            <i class="bi bi-search"></i> Search
+        </button>
+    </form>
+</div>
+
+<!-- Members Table Card -->
+<div class="fade-in">
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="bi bi-table" style="margin-right:8px; color:var(--primary-500);"></i>All Members</h5>
+        </div>
+        <div class="card-body-compact">
+            <div class="table-container">
+                <table class="table" id="tbl-members">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Member ID</th>
+                            <th>Trainer ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php get_patient_details(); ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    
-    
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-    </div>
-    </body>
-</html>
+</div>
+
+<?php
+$page_content = ob_get_clean();
+include 'layout.php';
+?>

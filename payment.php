@@ -1,69 +1,94 @@
-<!DOCTYPE html>
-<?php include("func.php");?>
-<html>
-<head>
-	<title>Members details</title>
-	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-</head>
-<body>
-<div class="jumbotron" style="background: url('images/2.jpg') no-repeat;background-size: cover;height: 300px;"></div>	
+<?php
+/**
+ * Payments — View payment history and record new payments
+ */
+require_once 'func.php';
 
- <div class="container">
-<div class="card">
-     <div class="card-body" style="background-color:#3498DB;color:#ffffff;">
-         <div class="row">
-             <div class="col-md-1">
-    <a href="admin-panel.php" class="btn btn-light ">Go Back</a>
-             </div>
-             <div class="col-md-3"><h3>Payment Details</h3></div>
-             <div class="col-md-8">
-         <form class="form-group" action="patient_search.php" method="post">
-          <div class="row">
-              
-                 </form></div></div></div>
-     <div class="card-body" style="background-color:#3498DB;color:#ffffff;">
-         <div class="card-body">
-    <table class="table table-hover">
-        <thead>
-     <tr>
-            <th>Payment ID </th>
-            <th>Amount</th>
-            <th>Payment Type</th>
-            <th>Customer ID</th>
-            <th>Customer Name</th>
-         
-        </tr>   
-        </thead>
-        
-        <tbody>
-          <?php get_payment(); ?>
-        </tbody>
-    </table>
-    <div class="card-body" style="background-color:#3498DB;color:FFFFFF;">
-                <h3>Make new Payment</h3>
-                </div> 
-                <div class="card-body"></div>
-                <form class="form-group" action="func.php" method="post">
-                <label>Payment ID</label>
-<input type="text" name="Payment_id" class="form-control"><br>
- 
-                    <label>Amount</label>
-                    <input type="text" name="Amount" class="form-control"><br>
-                    <label>Customer ID</label>
-                    <input type="text" name="customer_id" class="form-control"><br>
-                    <label>Customer Name</label>
-                    <input type="text" name="customer_name" class="form-control"><br>
-                    <label>Payment Type</label>
-                    
-<input type="text" name="payment_type" class="form-control"><br> 
-<input type="submit" class="btn btn-primary" name="pay_submit" value="PAY">
-     </div>
+$page_title = "Payments";
+$current_page = "payments";
+
+ob_start();
+?>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-credit-card-fill" style="margin-right:8px; color:var(--primary-500);"></i>Payments</h1>
+        <p>View payment history and record new payments</p>
     </div>
+</div>
+
+<div class="row g-4">
+    <!-- Payment History Table -->
+    <div class="col-lg-8 fade-in">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history" style="margin-right:8px; color:var(--primary-500);"></i>Payment History</h5>
+            </div>
+            <div class="card-body-compact">
+                <div class="table-container">
+                    <table class="table" id="tbl-payments">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Customer ID</th>
+                                <th>Customer Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php get_payment(); ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+    <!-- New Payment Form -->
+    <div class="col-lg-4 fade-in">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-plus-circle-fill" style="margin-right:8px; color:var(--success-500);"></i>New Payment</h5>
+            </div>
+            <div class="card-body">
+                <form action="func.php" method="post" id="form-new-payment">
+                    <div class="mb-3">
+                        <label for="input-payment-id" class="form-label">Payment ID</label>
+                        <input type="text" name="Payment_id" id="input-payment-id" class="form-control" placeholder="Enter payment ID" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input-amount" class="form-label">Amount</label>
+                        <input type="text" name="Amount" id="input-amount" class="form-control" placeholder="Enter amount" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input-customer-id" class="form-label">Customer ID</label>
+                        <input type="text" name="customer_id" id="input-customer-id" class="form-control" placeholder="Enter customer ID" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input-customer-name" class="form-label">Customer Name</label>
+                        <input type="text" name="customer_name" id="input-customer-name" class="form-control" placeholder="Enter customer name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="input-payment-type" class="form-label">Payment Type</label>
+                        <input type="text" name="payment_type" id="input-payment-type" class="form-control" placeholder="e.g. Cash, Card, Transfer" required>
+                    </div>
+
+                    <button type="submit" name="pay_submit" class="btn btn-primary w-100" id="btn-submit-payment">
+                        <i class="bi bi-credit-card"></i> Record Payment
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-    </body>
-</html>
+</div>
+
+<?php
+$page_content = ob_get_clean();
+include 'layout.php';
+?>
