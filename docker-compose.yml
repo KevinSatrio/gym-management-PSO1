@@ -6,7 +6,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASS: ${DB_PASS}
+      DB_PASS: ${DB_PASS:-}
       DB_NAME: loginsystem
     depends_on:
       db:
@@ -15,13 +15,13 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
       MYSQL_DATABASE: loginsystem
     volumes:
       - db_data:/var/lib/mysql
       - ./loginsystem.sql:/docker-entrypoint-initdb.d/loginsystem.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-rootpass}"]
       interval: 5s
       timeout: 5s
       retries: 10

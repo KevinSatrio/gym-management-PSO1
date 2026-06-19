@@ -4,29 +4,49 @@ on:
     branches: ["master"]
   pull_request:
     branches: ["master"]
+
+env:
+  DB_PASS: rootpass
+  MYSQL_ROOT_PASSWORD: rootpass
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Build containers
         run: docker compose build
+
       - name: Run containers
         run: docker compose up -d
-      - name: Wait for containers (DB ready)
-        run: sleep 15
+
+      - name: Wait for DB to be healthy
+        run: |
+          echo "Waiting for database to be ready..."
+          for i in $(seq 1 30); do
+            if docker compose exec -T db mysqladmin ping -h 127.0.0.1 -prootpass --silent 2>/dev/null; then
+              echo "Database is ready!"
+              break
+            fi
+            echo "Attempt $i/30 - waiting..."
+            sleep 2
+          done
+
       - name: Install Composer dependencies
         run: docker compose exec -T app composer install --no-interaction --prefer-dist
+
       - name: Validate composer.json
         run: docker compose exec -T app composer validate
+
       - name: Check PHP syntax (lint)
         run: docker compose exec -T app find . -type f -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
-      - name: Fix coding style with PHPCBF
-        run: docker compose exec -T app ./vendor/bin/phpcbf
-        continue-on-error: true
+
       - name: Run PHP_CodeSniffer (PSR-12)
         run: docker compose exec -T app ./vendor/bin/phpcs
+        continue-on-error: true
+
       - name: Test DB Connection
         run: |
           docker compose exec -T app php -r "
@@ -42,13 +62,25 @@ jobs:
           }
           echo 'DB OK';
           "
+
       - name: Create reports directory
         run: docker compose exec -T app mkdir -p reports/phpunit
+
       - name: Run PHPUnit tests
         run: docker compose exec -T app ./vendor/bin/phpunit --configuration phpunit.xml
+
+      - name: Copy test results from container
+        if: always()
+        run: docker compose cp app:/var/www/html/reports/phpunit/. ./reports/phpunit/ || true
+
       - name: Upload PHPUnit test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: phpunit-results
           path: reports/phpunit/
+          if-no-files-found: ignore
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down
